@@ -44,7 +44,7 @@ resource "aws_ecs_task_definition" "medusa_task" {
 
   container_definitions = jsonencode([{
     name      = "medusa-backend"
-    image     = "your_docker_image"  # Replace with your Medusa Docker image or ECR URI
+    image     = "my_image"  
     essential = true
     portMappings = [
       {
