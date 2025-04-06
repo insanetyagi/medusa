@@ -48,7 +48,7 @@ resource "aws_ecs_task_definition" "medusa_task" {
     essential = true
     portMappings = [
       {
-        containerPort = 9000
+        containerPort = 9000     #this is port mapping
         hostPort      = 9000
         protocol      = "tcp"
       }
