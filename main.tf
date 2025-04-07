@@ -67,31 +67,42 @@
 #   }
 # }
 
-provider "aws" {
-  region = "us-east-1"
-  version = "~> 4.0"  # Specify an appropriate version here
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 4.0"  # Ensure the AWS provider is within version 4.x.x
+    }
+  }
 }
 
+provider "aws" {
+  region = "us-east-1"
+}
 
-resource "aws_vpc" "main" {
+# VPC Creation with a unique name
+resource "aws_vpc" "medusa_vpc" {
   cidr_block = "10.0.0.0/16"
   enable_dns_support = true
   enable_dns_hostnames = true
 }
 
-resource "aws_subnet" "subnet_public" {
-  vpc_id                  = aws_vpc.main.id
+# Subnet Creation with a unique name
+resource "aws_subnet" "medusa_subnet_public" {
+  vpc_id                  = aws_vpc.medusa_vpc.id
   cidr_block              = "10.0.1.0/24"
   availability_zone       = "us-east-1a"
   map_public_ip_on_launch = true
 }
 
-resource "aws_ecs_cluster" "medusa_cluster" {
-  name = "medusa-cluster"
+# ECS Cluster with a unique name
+resource "aws_ecs_cluster" "medusa_cluster_unique" {
+  name = "medusa-cluster-unique-12345"
 }
 
-resource "aws_iam_role" "ecs_execution_role" {
-  name = "ecs-execution-role"
+# IAM Role with a unique name
+resource "aws_iam_role" "medusa_ecs_execution_role" {
+  name = "medusa-ecs-execution-role-unique-12345"  # Unique role name
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -108,9 +119,10 @@ resource "aws_iam_role" "ecs_execution_role" {
   })
 }
 
-resource "aws_ecs_task_definition" "medusa_task" {
-  family                   = "medusa-task"
-  execution_role_arn       = aws_iam_role.ecs_execution_role.arn
+# ECS Task Definition with a unique family name
+resource "aws_ecs_task_definition" "medusa_task_unique" {
+  family                   = "medusa-task-unique-12345"
+  execution_role_arn       = aws_iam_role.medusa_ecs_execution_role.arn
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
   cpu                      = "256"
@@ -130,16 +142,16 @@ resource "aws_ecs_task_definition" "medusa_task" {
   }])
 }
 
-resource "aws_ecs_service" "medusa_service" {
-  name            = "medusa-service"
-  cluster         = aws_ecs_cluster.medusa_cluster.id
-  task_definition = aws_ecs_task_definition.medusa_task.arn
+# ECS Service with a unique name
+resource "aws_ecs_service" "medusa_service_unique" {
+  name            = "medusa-service-unique-12345"
+  cluster         = aws_ecs_cluster.medusa_cluster_unique.id
+  task_definition = aws_ecs_task_definition.medusa_task_unique.arn
   desired_count   = 1
   launch_type     = "FARGATE"
 
   network_configuration {
-    subnets          = [aws_subnet.subnet_public.id]
+    subnets          = [aws_subnet.medusa_subnet_public.id]
     assign_public_ip = true
   }
 }
-
