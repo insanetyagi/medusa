@@ -69,7 +69,9 @@
 
 provider "aws" {
   region = "us-east-1"
+  version = "~> 4.0"  # Specify an appropriate version here
 }
+
 
 resource "aws_vpc" "main" {
   cidr_block = "10.0.0.0/16"
